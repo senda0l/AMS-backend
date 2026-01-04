@@ -9,7 +9,8 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { UploadService } from './upload.service';
-import { memoryStorage, File } from 'multer';
+import { memoryStorage } from 'multer';
+// import type { File } from '@types/multer';
 
 @Controller('upload')
 @UseGuards(JwtAuthGuard)
@@ -25,7 +26,7 @@ export class UploadController {
       },
     }),
   )
-  async uploadImages(@UploadedFiles() files: File[]) {
+  async uploadImages(@UploadedFiles() files: any[]) {
     if (!files || files.length === 0) {
       throw new BadRequestException('No files provided');
     }

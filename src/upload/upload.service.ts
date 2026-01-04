@@ -2,7 +2,6 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
-import { File } from 'multer';
 
 @Injectable()
 export class UploadService {
@@ -19,7 +18,7 @@ export class UploadService {
     }
   }
 
-  async saveFile(file: File): Promise<string> {
+  async saveFile(file: any): Promise<string> {
     if (!file) {
       throw new BadRequestException('No file provided');
     }
@@ -49,7 +48,7 @@ export class UploadService {
     return `/uploads/${filename}`;
   }
 
-  async saveMultipleFiles(files: File[]): Promise<string[]> {
+  async saveMultipleFiles(files: any[]): Promise<string[]> {
     if (!files || files.length === 0) {
       return [];
     }

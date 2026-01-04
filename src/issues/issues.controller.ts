@@ -14,7 +14,7 @@ import {
   UploadedFiles,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { memoryStorage, File } from 'multer';
+import { memoryStorage } from 'multer';
 import { IssuesService } from './issues.service';
 import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueStatusDto } from './dto/update-issue-status.dto';
@@ -46,7 +46,7 @@ export class IssuesController {
   async create(
     @Body() createIssueDto: CreateIssueDto,
     @Request() req,
-    @UploadedFiles() files?: File[],
+    @UploadedFiles() files?: any[],
   ) {
     // Upload files if provided
     if (files && files.length > 0) {

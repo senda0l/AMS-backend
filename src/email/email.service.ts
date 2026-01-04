@@ -1,10 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { createTransport, Transporter } from 'nodemailer';
 
 @Injectable()
 export class EmailService {
-  private transporter: nodemailer.Transporter;
+  private transporter: Transporter | null = null;
   private readonly logger = new Logger(EmailService.name);
   private readonly enabled: boolean;
 
@@ -12,7 +12,7 @@ export class EmailService {
     this.enabled = this.configService.get('EMAIL_ENABLED') === 'true';
     
     if (this.enabled) {
-      this.transporter = nodemailer.createTransport({
+      this.transporter = createTransport({
         host: this.configService.get('EMAIL_HOST') || 'smtp.gmail.com',
         port: parseInt(this.configService.get('EMAIL_PORT') || '587'),
         secure: false,
@@ -30,7 +30,7 @@ export class EmailService {
     html: string,
     text?: string,
   ): Promise<void> {
-    if (!this.enabled) {
+    if (!this.enabled || !this.transporter) {
       this.logger.warn('Email sending is disabled. Skipping email to ' + to);
       return;
     }
