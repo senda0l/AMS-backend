@@ -42,6 +42,21 @@ export class AnalyticsController {
   getCategoryResolutionStats() {
     return this.analyticsService.getCategoryResolutionStats();
   }
+
+  @Get('stats-by-category')
+  getIssueStatsByCategory() {
+    return this.analyticsService.getIssueStatsByCategory();
+  }
+
+  @Get('stats-by-status')
+  getIssueStatsByStatus() {
+    return this.analyticsService.getIssueStatsByStatus();
+  }
+
+  @Get('stats-by-priority')
+  getIssueStatsByPriority() {
+    return this.analyticsService.getIssueStatsByPriority();
+  }
 }
 
 

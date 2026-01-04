@@ -7,6 +7,9 @@ import { Apartment } from './entities/apartment.entity';
 import { CreateBuildingDto } from './dto/create-building.dto';
 import { CreateEntranceDto } from './dto/create-entrance.dto';
 import { CreateApartmentDto } from './dto/create-apartment.dto';
+import { UpdateBuildingDto } from './dto/update-building.dto';
+import { UpdateEntranceDto } from './dto/update-entrance.dto';
+import { UpdateApartmentDto } from './dto/update-apartment.dto';
 
 @Injectable()
 export class BuildingsService {
@@ -44,6 +47,12 @@ export class BuildingsService {
     return building;
   }
 
+  async updateBuilding(id: string, updateBuildingDto: UpdateBuildingDto) {
+    const building = await this.findOneBuilding(id);
+    Object.assign(building, updateBuildingDto);
+    return this.buildingRepository.save(building);
+  }
+
   // Entrances
   async createEntrance(createEntranceDto: CreateEntranceDto) {
     const entrance = this.entranceRepository.create(createEntranceDto);
@@ -56,6 +65,25 @@ export class BuildingsService {
       where,
       relations: ['building', 'apartments'],
     });
+  }
+
+  async findOneEntrance(id: string) {
+    const entrance = await this.entranceRepository.findOne({
+      where: { id },
+      relations: ['building', 'apartments'],
+    });
+
+    if (!entrance) {
+      throw new NotFoundException(`Entrance with ID ${id} not found`);
+    }
+
+    return entrance;
+  }
+
+  async updateEntrance(id: string, updateEntranceDto: UpdateEntranceDto) {
+    const entrance = await this.findOneEntrance(id);
+    Object.assign(entrance, updateEntranceDto);
+    return this.entranceRepository.save(entrance);
   }
 
   // Apartments
@@ -83,6 +111,12 @@ export class BuildingsService {
     }
 
     return apartment;
+  }
+
+  async updateApartment(id: string, updateApartmentDto: UpdateApartmentDto) {
+    const apartment = await this.findOneApartment(id);
+    Object.assign(apartment, updateApartmentDto);
+    return this.apartmentRepository.save(apartment);
   }
 }
 

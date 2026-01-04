@@ -6,6 +6,7 @@ import { Issue } from '../issues/entities/issue.entity';
 import { IssueStatus } from 'src/issues/entities/issue-status.enum';
 import { User } from '../users/entities/user.entity';
 import { RoleType } from '../roles/entities/role.entity';
+import { EmailService } from '../email/email.service';
 
 @Injectable()
 export class NotificationsService {
@@ -14,16 +15,23 @@ export class NotificationsService {
     private notificationRepository: Repository<Notification>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    private emailService: EmailService,
   ) {}
 
   async createIssueNotification(issue: Issue) {
     // Notify apartment manager of the building
-    const building = issue.apartment.entrance.building;
-    if (building.managerId) {
+    if (
+      issue.apartment?.entrance?.building?.managerId
+    ) {
+      const building = issue.apartment.entrance.building;
+      const manager = await this.userRepository.findOne({
+        where: { id: building.managerId },
+      });
+
       await this.createNotification({
         type: NotificationType.ISSUE_CREATED,
         title: 'New Issue Created',
-        message: `A new ${issue.category} issue has been created in ${issue.apartment.entrance.building.name}`,
+        message: `A new ${issue.category} issue has been created in ${building.name || 'the building'}`,
         userId: building.managerId,
         relatedIssueId: issue.id,
         metadata: {
@@ -31,6 +39,16 @@ export class NotificationsService {
           apartmentId: issue.apartmentId,
         },
       });
+
+      // Send email to manager
+      if (manager?.email) {
+        await this.emailService.sendIssueCreatedEmail(
+          manager.email,
+          issue.title,
+          issue.category,
+          building.name || 'the building',
+        );
+      }
     }
   }
 
@@ -40,6 +58,10 @@ export class NotificationsService {
     newStatus: IssueStatus,
   ) {
     // Notify the creator
+    const creator = await this.userRepository.findOne({
+      where: { id: issue.createdById },
+    });
+
     await this.createNotification({
       type: NotificationType.ISSUE_STATUS_CHANGED,
       title: 'Issue Status Updated',
@@ -49,8 +71,23 @@ export class NotificationsService {
       metadata: { oldStatus, newStatus },
     });
 
+    // Send email to creator
+    if (creator?.email) {
+      await this.emailService.sendIssueStatusChangeEmail(
+        creator.email,
+        issue.title,
+        oldStatus,
+        newStatus,
+        issue.id,
+      );
+    }
+
     // Notify assigned manager if exists
     if (issue.assignedManagerId) {
+      const manager = await this.userRepository.findOne({
+        where: { id: issue.assignedManagerId },
+      });
+
       await this.createNotification({
         type: NotificationType.ISSUE_STATUS_CHANGED,
         title: 'Issue Status Updated',
@@ -59,11 +96,26 @@ export class NotificationsService {
         relatedIssueId: issue.id,
         metadata: { oldStatus, newStatus },
       });
+
+      // Send email to manager
+      if (manager?.email) {
+        await this.emailService.sendIssueStatusChangeEmail(
+          manager.email,
+          issue.title,
+          oldStatus,
+          newStatus,
+          issue.id,
+        );
+      }
     }
   }
 
   async createAssignmentNotification(issue: Issue) {
     if (issue.assignedManagerId) {
+      const manager = await this.userRepository.findOne({
+        where: { id: issue.assignedManagerId },
+      });
+
       await this.createNotification({
         type: NotificationType.ISSUE_ASSIGNED,
         title: 'Issue Assigned to You',
@@ -72,6 +124,15 @@ export class NotificationsService {
         relatedIssueId: issue.id,
         metadata: { category: issue.category },
       });
+
+      // Send email to manager
+      if (manager?.email) {
+        await this.emailService.sendIssueAssignedEmail(
+          manager.email,
+          issue.title,
+          issue.id,
+        );
+      }
     }
   }
 

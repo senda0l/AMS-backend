@@ -1,5 +1,6 @@
 import { IsEnum, IsString, IsArray, IsUUID, IsOptional } from 'class-validator';
 import { IssueCategory } from '../entities/issue.entity';
+import { IssuePriority } from '../entities/issue-priority.enum';
 
 export class CreateIssueDto {
   @IsEnum(IssueCategory)
@@ -18,6 +19,10 @@ export class CreateIssueDto {
 
   @IsUUID()
   apartmentId: string;
+
+  @IsOptional()
+  @IsEnum(IssuePriority)
+  priority?: IssuePriority;
 }
 
 

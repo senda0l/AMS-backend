@@ -132,6 +132,49 @@ export class AnalyticsService {
       statusDistribution,
     };
   }
+
+  async getIssueStatsByCategory() {
+    const result = await this.issueRepository
+      .createQueryBuilder('issue')
+      .select('issue.category', 'category')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('issue.category')
+      .getRawMany();
+    
+    return result.map(item => ({
+      category: item.category,
+      count: parseInt(item.count, 10),
+    }));
+  }
+
+  async getIssueStatsByStatus() {
+    const result = await this.issueRepository
+      .createQueryBuilder('issue')
+      .select('issue.status', 'status')
+      .addSelect('COUNT(*)', 'count')
+      .groupBy('issue.status')
+      .getRawMany();
+    
+    return result.map(item => ({
+      status: item.status,
+      count: parseInt(item.count, 10),
+    }));
+  }
+
+  async getIssueStatsByPriority() {
+    const result = await this.issueRepository
+      .createQueryBuilder('issue')
+      .select('issue.priority', 'priority')
+      .addSelect('COUNT(*)', 'count')
+      .where('issue.priority IS NOT NULL')
+      .groupBy('issue.priority')
+      .getRawMany();
+    
+    return result.map(item => ({
+      priority: item.priority,
+      count: parseInt(item.count, 10),
+    }));
+  }
 }
 
 

@@ -10,6 +10,8 @@ import { IssuesModule } from './issues/issues.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { RolesModule } from './roles/roles.module';
+import { UploadModule } from './upload/upload.module';
+import { EmailModule } from './email/email.module';
 import { typeOrmConfig } from './config/typeorm.config';
 
 @Module({
@@ -26,6 +28,7 @@ import { typeOrmConfig } from './config/typeorm.config';
     NotificationsModule,
     AnalyticsModule,
     RolesModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

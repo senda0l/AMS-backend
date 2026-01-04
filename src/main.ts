@@ -26,6 +26,10 @@ async function bootstrap() {
   // Global prefix
   app.setGlobalPrefix('api');
 
+  // Serve static files from uploads directory
+  const express = require('express');
+  app.use('/uploads', express.static('uploads'));
+
   const port = configService.get('PORT') || 3000;
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}/api`);

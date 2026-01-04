@@ -4,8 +4,10 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import { IssueStatus } from './issue-status.enum';
+import { IssuePriority } from './issue-priority.enum';
 import { BaseEntity } from '../../common/entities/base.entity';
 import { User } from '../../users/entities/user.entity';
 import { Apartment } from '../../buildings/entities/apartment.entity';
@@ -22,8 +24,14 @@ export enum IssueCategory {
 
 
 @Entity('issues')
+@Index(['status', 'createdAt'])
+@Index(['category', 'status'])
+@Index(['apartmentId', 'status'])
+@Index(['assignedManagerId', 'status'])
+@Index(['priority', 'status'])
 export class Issue extends BaseEntity {
   @Column({ type: 'enum', enum: IssueCategory })
+  @Index()
   category: IssueCategory;
 
   @Column()
@@ -36,7 +44,12 @@ export class Issue extends BaseEntity {
   photos: string[];
 
   @Column({ type: 'enum', enum: IssueStatus, default: IssueStatus.NEW })
+  @Index()
   status: IssueStatus;
+
+  @Column({ type: 'enum', enum: IssuePriority, default: IssuePriority.MEDIUM })
+  @Index()
+  priority: IssuePriority;
 
   @Column({ type: 'uuid' })
   createdById: string;
