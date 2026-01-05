@@ -47,6 +47,28 @@ export class User extends BaseEntity {
 
   @Column({ default: true })
   isActive: boolean;
+
+  @Column({ nullable: true, unique: true })
+  invitationToken: string;
+
+  @Column({ type: 'timestamp', nullable: true })
+  invitationTokenExpiresAt: Date;
+
+  @Column({ type: 'uuid', nullable: true })
+  invitedById: string;
+
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: 'invitedById' })
+  invitedBy: User;
+
+  @Column({ type: 'timestamp', nullable: true })
+  invitedAt: Date;
+
+  @Column({ default: false })
+  isInvitationPending: boolean;
+
+  @Column({ nullable: true })
+  temporaryPassword: string;
 }
 
 

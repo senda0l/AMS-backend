@@ -1,10 +1,12 @@
-import { Controller, Get, Param, UseGuards, ParseEnumPipe, Put, Body, Request } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, ParseEnumPipe, Put, Body, Request, Post, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RoleType } from '../roles/entities/role.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
+import { InviteUserDto } from './dto/invite-user.dto';
+import { CurrentUser } from '../common/decorators/current-user.decorator';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
@@ -34,13 +36,28 @@ export class UsersController {
   }
 
   @Get('profile/me')
-  getProfile(@Request() req) {
-    return this.usersService.findOne(req.user.id);
+  getProfile(@CurrentUser() user: any) {
+    return this.usersService.findOne(user.id);
   }
 
   @Put('profile/me')
-  updateProfile(@Request() req, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.usersService.updateProfile(req.user.id, updateProfileDto);
+  updateProfile(@CurrentUser() user: any, @Body() updateProfileDto: UpdateProfileDto) {
+    return this.usersService.updateProfile(user.id, updateProfileDto);
+  }
+
+  @Post('invite')
+  @UseGuards(RolesGuard)
+  @Roles(RoleType.ADMIN, RoleType.APARTMENT_MANAGER)
+  inviteUser(@CurrentUser() user: any, @Body() inviteUserDto: InviteUserDto) {
+    return this.usersService.inviteUser(user.id, inviteUserDto);
+  }
+
+  @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles(RoleType.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  deleteUser(@Param('id') id: string, @CurrentUser() currentUser: any) {
+    return this.usersService.deleteUser(id, currentUser.id);
   }
 }
 

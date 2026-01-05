@@ -133,6 +133,7 @@ export class AnalyticsService {
     };
   }
 
+  
   async getIssueStatsByCategory() {
     const result = await this.issueRepository
       .createQueryBuilder('issue')

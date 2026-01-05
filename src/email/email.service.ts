@@ -102,6 +102,33 @@ export class EmailService {
     await this.sendEmail(to, subject, html);
   }
 
+  async sendInvitationEmail(
+    to: string,
+    invitationToken: string,
+    temporaryPassword: string,
+    frontendUrl?: string,
+  ): Promise<void> {
+    const registrationUrl = frontendUrl
+      ? `${frontendUrl}/complete-registration?token=${invitationToken}`
+      : `${this.configService.get('FRONTEND_URL') || 'http://localhost:5173'}/complete-registration?token=${invitationToken}`;
+
+    const subject = 'Welcome to Apartment Management System';
+    const html = `
+      <h2>Welcome to Apartment Management System</h2>
+      <p>You have been invited to join the Apartment Management System.</p>
+      <p>To complete your registration, please click the link below:</p>
+      <p><a href="${registrationUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 10px 0;">Complete Registration</a></p>
+      <p>Or copy and paste this URL into your browser:</p>
+      <p style="word-break: break-all;">${registrationUrl}</p>
+      <p><strong>Temporary Password:</strong> ${temporaryPassword}</p>
+      <p><em>Note: You will be asked to change this password during registration. Please keep it secure and do not share it.</em></p>
+      <p>This invitation link will expire in 7 days.</p>
+      <p>If you did not expect this invitation, please ignore this email.</p>
+    `;
+
+    await this.sendEmail(to, subject, html);
+  }
+
   private stripHtml(html: string): string {
     return html.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ');
   }
