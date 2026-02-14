@@ -1,23 +1,22 @@
 import { DataSource } from 'typeorm';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 import { typeOrmConfig } from '../../config/typeorm.config';
 import { User } from '../../users/entities/user.entity';
 import { Role, RoleType } from '../../roles/entities/role.entity';
+
 export async function seedSuperUser(dataSource: DataSource) {
   try {
     const userRepository = dataSource.getRepository(User);
     const roleRepository = dataSource.getRepository(Role);
 
-    // Находим роль apartment_user
-    const apartmentUserRole = await roleRepository.findOne({
-      where: { type: RoleType.APARTMENT_USER },
+    const adminRole = await roleRepository.findOne({
+      where: { type: RoleType.ADMIN },
     });
 
-    if (!apartmentUserRole) {
-      throw new Error('Role apartment_user not found. Run roles seed first.');
+    if (!adminRole) {
+      throw new Error('Admin role not found. Run roles seed first.');
     }
 
-    // Проверяем, есть ли уже суперюзер
     const existingUser = await userRepository.findOne({
       where: { email: 'superuser@example.com' },
     });
@@ -27,26 +26,30 @@ export async function seedSuperUser(dataSource: DataSource) {
       return;
     }
 
-    // Создаем суперпользователя
     const user = new User();
     user.firstName = 'Super';
     user.lastName = 'User';
     user.email = 'superuser@example.com';
-    user.password = await bcrypt.hash('superpassword', 10); // хэшируем пароль
-    user.role = apartmentUserRole;
+    user.password = await bcrypt.hash('superpassword', 10);
+    user.role = adminRole;
     user.isActive = true;
 
     await userRepository.save(user);
-    console.log('Superuser created');
+    console.log('Superuser created with admin role');
   } catch (err) {
     console.error('Error seeding superuser:', err);
   }
 }
-  const dataSource = new DataSource(typeOrmConfig);
 
-// Для запуска напрямую
+const dataSource = new DataSource(typeOrmConfig);
+
 if (require.main === module) {
-  dataSource.initialize()
+  dataSource
+    .initialize()
     .then(() => seedSuperUser(dataSource))
-    .then(() => dataSource.destroy());
+    .then(() => dataSource.destroy())
+    .catch((err) => {
+      console.error('Failed to seed superuser:', err);
+      process.exit(1);
+    });
 }

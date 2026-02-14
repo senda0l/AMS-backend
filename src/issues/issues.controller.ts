@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Query,
-  UseGuards,
   Request,
   Patch,
   ParseIntPipe,
@@ -20,14 +19,9 @@ import { CreateIssueDto } from './dto/create-issue.dto';
 import { UpdateIssueStatusDto } from './dto/update-issue-status.dto';
 import { UpdateIssueDto } from './dto/update-issue.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
-import { Roles } from '../common/decorators/roles.decorator';
-import { RoleType } from '../roles/entities/role.entity';
 import { UploadService } from '../upload/upload.service';
 
 @Controller('issues')
-@UseGuards(JwtAuthGuard)
 export class IssuesController {
   constructor(
     private readonly issuesService: IssuesService,
@@ -45,7 +39,7 @@ export class IssuesController {
   )
   async create(
     @Body() createIssueDto: CreateIssueDto,
-    @Request() req,
+    @Request() req: any,
     @UploadedFiles() files?: any[],
   ) {
     // Upload files if provided
@@ -97,7 +91,7 @@ export class IssuesController {
   updateStatus(
     @Param('id') id: string,
     @Body() updateStatusDto: UpdateIssueStatusDto,
-    @Request() req,
+    @Request() req: any,
   ) {
     return this.issuesService.updateStatus(
       id,
@@ -111,7 +105,7 @@ export class IssuesController {
   update(
     @Param('id') id: string,
     @Body() updateIssueDto: UpdateIssueDto,
-    @Request() req,
+    @Request() req: any,
   ) {
     return this.issuesService.update(id, updateIssueDto, req.user);
   }
@@ -120,7 +114,7 @@ export class IssuesController {
   addComment(
     @Param('id') id: string,
     @Body() createCommentDto: CreateCommentDto,
-    @Request() req,
+    @Request() req: any,
   ) {
     return this.issuesService.addComment(id, createCommentDto, req.user.id);
   }

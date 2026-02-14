@@ -6,7 +6,6 @@ import {
   Body,
   Param,
   Query,
-  UseGuards,
 } from '@nestjs/common';
 import { BuildingsService } from './buildings.service';
 import { CreateBuildingDto } from './dto/create-building.dto';
@@ -15,19 +14,15 @@ import { CreateApartmentDto } from './dto/create-apartment.dto';
 import { UpdateBuildingDto } from './dto/update-building.dto';
 import { UpdateEntranceDto } from './dto/update-entrance.dto';
 import { UpdateApartmentDto } from './dto/update-apartment.dto';
-import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
-import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Public } from '../common/decorators/public.decorator';
 import { RoleType } from '../roles/entities/role.entity';
 
 @Controller('buildings')
-@UseGuards(JwtAuthGuard)
 export class BuildingsController {
   constructor(private readonly buildingsService: BuildingsService) {}
 
   @Post()
-  @UseGuards(RolesGuard)
   @Roles(RoleType.ADMIN)
   createBuilding(@Body() createBuildingDto: CreateBuildingDto) {
     return this.buildingsService.createBuilding(createBuildingDto);
@@ -39,7 +34,6 @@ export class BuildingsController {
   }
 
   @Post('entrances')
-  @UseGuards(RolesGuard)
   @Roles(RoleType.ADMIN)
   createEntrance(@Body() createEntranceDto: CreateEntranceDto) {
     return this.buildingsService.createEntrance(createEntranceDto);
@@ -56,14 +50,12 @@ export class BuildingsController {
   }
 
   @Patch('entrances/:id')
-  @UseGuards(RolesGuard)
   @Roles(RoleType.ADMIN)
   updateEntrance(@Param('id') id: string, @Body() updateEntranceDto: UpdateEntranceDto) {
     return this.buildingsService.updateEntrance(id, updateEntranceDto);
   }
 
   @Post('apartments')
-  @UseGuards(RolesGuard)
   @Roles(RoleType.ADMIN)
   createApartment(@Body() createApartmentDto: CreateApartmentDto) {
     return this.buildingsService.createApartment(createApartmentDto);
@@ -81,7 +73,6 @@ export class BuildingsController {
   }
 
   @Patch('apartments/:id')
-  @UseGuards(RolesGuard)
   @Roles(RoleType.ADMIN)
   updateApartment(@Param('id') id: string, @Body() updateApartmentDto: UpdateApartmentDto) {
     return this.buildingsService.updateApartment(id, updateApartmentDto);
@@ -93,7 +84,6 @@ export class BuildingsController {
   }
 
   @Patch(':id')
-  @UseGuards(RolesGuard)
   @Roles(RoleType.ADMIN)
   updateBuilding(@Param('id') id: string, @Body() updateBuildingDto: UpdateBuildingDto) {
     return this.buildingsService.updateBuilding(id, updateBuildingDto);

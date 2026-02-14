@@ -116,9 +116,9 @@ export class AuthService {
     user.password = hashedPassword;
     user.isInvitationPending = false;
     user.isActive = true;
-    user.invitationToken = null; // Clear the token
+    user.invitationToken = null;
     user.invitationTokenExpiresAt = null;
-    user.temporaryPassword = null; // Clear temporary password
+    user.temporaryPassword = null;
 
     const savedUser = await this.userRepository.save(user);
 

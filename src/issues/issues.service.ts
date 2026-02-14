@@ -354,7 +354,7 @@ export class IssuesService {
   }
 
   private isCategoryMatch(category: string, roleType: RoleType): boolean {
-    const categoryMap = {
+    const categoryMap: Record<string, string> = {
       [RoleType.GAS_MANAGER]: 'gas',
       [RoleType.WATER_TUBES_MANAGER]: 'water',
       [RoleType.CLEANING_MANAGER]: 'cleaning',

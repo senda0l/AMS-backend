@@ -66,7 +66,7 @@ export class Issue extends BaseEntity {
   apartment: Apartment;
 
   @Column({ type: 'uuid', nullable: true })
-  assignedManagerId: string;
+  assignedManagerId: string | null;
 
   @ManyToOne(() => User, (user) => user.assignedIssues)
   @JoinColumn({ name: 'assignedManagerId' })
@@ -79,7 +79,7 @@ export class Issue extends BaseEntity {
   statusHistory: StatusHistory[];
 
   @Column({ type: 'timestamp', nullable: true })
-  resolvedAt: Date;
+  resolvedAt: Date | null;
 }
 
 

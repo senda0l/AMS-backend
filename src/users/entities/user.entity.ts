@@ -8,67 +8,67 @@ import { Notification } from '../../notifications/entities/notification.entity';
 @Entity('users')
 export class User extends BaseEntity {
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column()
-  firstName: string;
+  firstName!: string;
 
   @Column()
-  lastName: string;
+  lastName!: string;
 
-  @Column({ nullable: true })
-  phone: string;
+  @Column({ type: 'varchar', nullable: true })
+  phone!: string | null;
 
   @Column({ type: 'uuid', nullable: true })
-  roleId: string;
+  roleId!: string | null;
 
   @ManyToOne(() => Role, { eager: true })
   @JoinColumn({ name: 'roleId' })
-  role: Role;
+  role!: Role;
 
   @Column({ type: 'uuid', nullable: true })
-  apartmentId: string;
+  apartmentId!: string | null;
 
   @ManyToOne(() => Apartment, (apartment) => apartment.residents)
   @JoinColumn({ name: 'apartmentId' })
-  apartment: Apartment;
+  apartment!: Apartment;
 
   @OneToMany(() => Issue, (issue) => issue.createdBy)
-  createdIssues: Issue[];
+  createdIssues!: Issue[];
 
   @OneToMany(() => Issue, (issue) => issue.assignedManager)
-  assignedIssues: Issue[];
+  assignedIssues!: Issue[];
 
   @OneToMany(() => Notification, (notification) => notification.user)
-  notifications: Notification[];
+  notifications!: Notification[];
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
-  @Column({ nullable: true, unique: true })
-  invitationToken: string;
+  @Column({ type: 'varchar', nullable: true, unique: true })
+  invitationToken!: string | null;
 
   @Column({ type: 'timestamp', nullable: true })
-  invitationTokenExpiresAt: Date;
+  invitationTokenExpiresAt!: Date | null;
 
   @Column({ type: 'uuid', nullable: true })
-  invitedById: string;
+  invitedById!: string | null;
 
   @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'invitedById' })
-  invitedBy: User;
+  invitedBy!: User;
 
   @Column({ type: 'timestamp', nullable: true })
-  invitedAt: Date;
+  invitedAt!: Date | null;
 
   @Column({ default: false })
-  isInvitationPending: boolean;
+  isInvitationPending!: boolean;
 
-  @Column({ nullable: true })
-  temporaryPassword: string;
+  @Column({ type: 'varchar', nullable: true })
+  temporaryPassword!: string | null;
 }
 
 

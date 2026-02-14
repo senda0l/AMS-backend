@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { User } from './entities/user.entity';
-import { RoleType } from 'src/roles/entities/role.entity';
+import { RoleType } from '../roles/entities/role.entity';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { InviteUserDto } from './dto/invite-user.dto';
 import { EmailService } from '../email/email.service';
@@ -133,16 +133,16 @@ export class UsersService {
     const user = this.userRepository.create({
       email: inviteUserDto.email,
       roleId: inviteUserDto.roleId,
-      apartmentId: inviteUserDto.apartmentId || null,
+      apartmentId: inviteUserDto.apartmentId || undefined,
       password: hashedTempPassword,
-      firstName: 'Pending', // Placeholder, will be updated during registration
+      firstName: 'Pending',
       lastName: 'User',
       invitationToken,
       invitationTokenExpiresAt,
       invitedById: inviterId,
       invitedAt: new Date(),
       isInvitationPending: true,
-      isActive: false, // User is inactive until they complete registration
+      isActive: false,
     });
 
     const savedUser = await this.userRepository.save(user);
@@ -155,7 +155,7 @@ export class UsersService {
     );
 
     // Return user without sensitive data
-    const { password, temporaryPassword: _, invitationToken: __, ...result } = savedUser;
+    const { password: _pw, temporaryPassword: _tp, invitationToken: _it, ...result } = savedUser;
     return result;
   }
 
@@ -207,7 +207,7 @@ export class UsersService {
     // Unassign issues assigned to this user
     await this.issueRepository.update(
       { assignedManagerId: userId },
-      { assignedManagerId: null },
+      { assignedManagerId: null as any },
     );
 
     // Delete notifications for this user

@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Notification, NotificationType } from './entities/notification.entity';
 import { Issue } from '../issues/entities/issue.entity';
-import { IssueStatus } from 'src/issues/entities/issue-status.enum';
+import { IssueStatus } from '../issues/entities/issue-status.enum';
 import { User } from '../users/entities/user.entity';
 import { RoleType } from '../roles/entities/role.entity';
 import { EmailService } from '../email/email.service';

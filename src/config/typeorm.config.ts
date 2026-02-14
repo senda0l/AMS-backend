@@ -6,41 +6,48 @@ config();
 
 const configService = new ConfigService();
 
-// Получаем DATABASE_URL из .env (Render даёт полный URL)
 const databaseUrl = configService.get('DATABASE_URL');
+const nodeEnv = configService.get('NODE_ENV') || 'development';
+const isProduction = nodeEnv === 'production';
+
 if (databaseUrl) {
-  console.log('✅ Используется DATABASE_URL (Render)');
-  console.log('📍 Хост:', databaseUrl.split('@')[1]?.split(':')[0]);
+  try {
+    const parsed = new URL(databaseUrl);
+    console.log(`✅ Using DATABASE_URL`);
+    console.log(`📍 Host: ${parsed.hostname}:${parsed.port}`);
+    console.log(`📍 Database: ${parsed.pathname.slice(1)}`);
+  } catch {
+    console.error('❌ Invalid DATABASE_URL format');
+    process.exit(1);
+  }
 } else {
-  console.log('✅ Используется локальная БД');
-  console.log('📍 Хост:', configService.get('DB_HOST') || 'localhost');
+  console.log('✅ Using local DB config');
+  console.log(`📍 Host: ${configService.get('DB_HOST') || 'localhost'}`);
 }
+
+const sharedConfig: Partial<DataSourceOptions> = {
+  type: 'postgres',
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
+  synchronize: !isProduction,
+  logging: !isProduction,
+};
 
 export const typeOrmConfig: DataSourceOptions = databaseUrl
   ? {
-      // Конфигурация для Render (через URL)
+      ...sharedConfig,
       type: 'postgres',
       url: databaseUrl,
-      ssl: {
-        rejectUnauthorized: false, // КРИТИЧНО для Render!
-      },
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-      migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-      synchronize: configService.get('NODE_ENV') === 'development',
-      logging: configService.get('NODE_ENV') === 'development',
+      ssl: { rejectUnauthorized: false },
     }
   : {
-      // Fallback для локальной БД
+      ...sharedConfig,
       type: 'postgres',
       host: configService.get('DB_HOST') || 'localhost',
-      port: configService.get('DB_PORT') || 5432,
-      username: configService.get('DB_USERNAME') || 'apartment_user',
-      password: configService.get('DB_PASSWORD') || 'apartment_pass',
-      database: configService.get('DB_DATABASE') || 'apartment_management',
-      entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-      migrations: [__dirname + '/../migrations/*{.ts,.js}'],
-      synchronize: configService.get('NODE_ENV') === 'development',
-      logging: configService.get('NODE_ENV') === 'development',
+      port: parseInt(configService.get('DB_PORT') || '5432', 10),
+      username: configService.get('DB_USER') || 'postgres',
+      password: configService.get('DB_PASSWORD') || '',
+      database: configService.get('DB_NAME') || 'apartment_management',
     };
 
 export default new DataSource(typeOrmConfig);
